@@ -11,17 +11,17 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
         
     ylags = pd.concat([lf_data.shift(l) for l in range(1,ylag + 1)], axis=1)
     y = lf_data.loc[start_date:end_date]
-    
-    #First HF index >= first y date
-    start_hf = [i for i in range(len(hf_data)) if hf_data.index[i] >= lf_data.index[0]][0]
 
-    x = np.array([hf_data.iloc[start_hf + i * xlag: start_hf + (i+1)*xlag, 0].values 
-                  for i in range(len(y))])
-    
+    x_rows = []
+
+    for i, lfdate in enumerate(y.index):
+        start_hf = hf_data.index.get_loc(lfdate, method='bfill')  # @todo Find a more efficient way
+        x_rows.append(hf_data.iloc[start_hf - horizon: start_hf - xlag - horizon: -1, 0].values)
+
+    x = np.array(x_rows)
     x = np.concatenate([ylags.loc[start_date:end_date], x], axis=1)
-    # Need consecutive xlag-sized chunks of HF data
-    
-    return lf_data.loc[start_date:end_date], x
+
+    return y, x
 
 
 if __name__ == '__main__':
@@ -30,6 +30,9 @@ if __name__ == '__main__':
     lf_data.set_index('DATE', inplace=True)
 
     hf_data = pd.read_csv('./tests/data/farmpay.csv', parse_dates=['DATE'])
-    hf_data.set_index('DATE',inplace=True)
-    y, x = mix_freq(lf_data, hf_data, 4, 2, 1, start_date=datetime.date(1985,1,1), end_date=datetime.date(2009,1,1))
+    hf_data.set_index('DATE', inplace=True)
 
+    lf_g = np.log(1 + lf_data.pct_change()).dropna() * 100.
+    hf_g = np.log(1 + hf_data.pct_change()).dropna() * 100.
+
+    y, x = mix_freq(lf_g.VALUE, hf_g, 9, 1, 1, start_date=datetime.datetime(1985,1,1), end_date=datetime.datetime(2009,1,1))
