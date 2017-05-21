@@ -32,7 +32,7 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
 
     for lfdate in lf_data.loc[start_date:].index:
         start_hf = hf_data.index.get_loc(lfdate, method='bfill')  # @todo Find a more efficient way
-        x_rows.append(hf_data.iloc[start_hf - horizon: start_hf - xlag - horizon: -1, 0].values)
+        x_rows.append(hf_data.iloc[start_hf - horizon: start_hf - xlag - horizon: -1].values)
 
     x = pd.DataFrame(data=x_rows, index=lf_data.loc[start_date:].index)
 

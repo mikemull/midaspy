@@ -1,5 +1,7 @@
 import pytest
+import os
 import datetime
+import numpy as np
 import pandas as pd
 
 from midas import mix
@@ -28,11 +30,44 @@ def hf_data():
     return df
 
 
+@pytest.fixture()
+def gdp_data(request):
+    df = pd.read_csv(os.path.join(os.path.dirname(request.module.__file__), 'data', 'gdp.csv'),
+                     parse_dates=['DATE'])
+
+    df['gdp'] = (np.log(df.VALUE) - np.log(df.VALUE.shift(1))) * 100.
+
+    return df.set_index('DATE')
+
+
+@pytest.fixture()
+def farmpay_data(request):
+    df = pd.read_csv(os.path.join(os.path.dirname(request.module.__file__), 'data', 'farmpay.csv'),
+                     parse_dates=['DATE'])
+
+    df['farmpay'] = (np.log(df.VALUE) - np.log(df.VALUE.shift(1))) * 100.
+
+    return df.set_index('DATE')
+
+
 def test_mix(lf_data, hf_data):
-    y, yl, x, yf, ylf, xf = mix.mix_freq(lf_data, hf_data, 3, 1, 1,
+    y, yl, x, yf, ylf, xf = mix.mix_freq(lf_data.val, hf_data.val, 3, 1, 1,
                                          start_date=datetime.datetime(2009, 7, 1),
                                          end_date=datetime.datetime(2010, 1, 1))
 
     assert all(x.loc['2009-07-01'].values == [0.6, 0.5, 0.4])
     assert all(x.loc['2010-01-01'].values == [1.2, 1.1, 1.0])
     assert yl.loc['2009-07-01'].values[0] == 1.0
+
+
+def test_mix_gdp(gdp_data, farmpay_data):
+
+    y, yl, x, yf, ylf, xf = mix.mix_freq(gdp_data.gdp, farmpay_data.farmpay, 3, 1, 1,
+                                         start_date=datetime.datetime(1985, 1, 1),
+                                         end_date=datetime.datetime(2009, 1, 1))
+
+    assert len(y) == 97
+
+    assert all(x.loc['1985-01-01'].values == [farmpay_data.loc['1984-12-01'].farmpay,
+                                              farmpay_data.loc['1984-11-01'].farmpay,
+                                              farmpay_data.loc['1984-10-01'].farmpay])
