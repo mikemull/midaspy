@@ -4,7 +4,7 @@ import numpy as np
 from scipy.optimize import least_squares
 
 from midas.weights import x_weighted
-from midas.fit import ssr
+from midas.fit import ssr, jacobian
 
 
 def estimate(y, yl, x):
@@ -16,7 +16,8 @@ def estimate(y, yl, x):
     print(c)
 
     f = lambda v: ssr(v, x.values, y.values, yl.values)
+    jac = lambda v: jacobian(v, x.values, y.values, yl.values)
 
-    opt_res = least_squares(f, np.concatenate([c[0:2], [1., 5.], c[2:]]))
+    opt_res = least_squares(f, np.concatenate([c[0:2], [1., 5.], c[2:]]), jac, method='lm', verbose=2)
 
     print(opt_res.x)
