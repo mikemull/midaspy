@@ -3,7 +3,7 @@ import numpy as np
 from .weights import x_weighted
 
 
-def resid(a, x, y, yl):
+def ssr(a, x, y, yl):
 
     xw, _ = x_weighted(x, a[2], a[3])
 
@@ -14,19 +14,12 @@ def resid(a, x, y, yl):
     return error
 
 
-def ssr(a, x, y, yl):
-
-    error = resid(a, x, y, yl)
-
-    return np.dot(error, error)
-
-
 def jacobian(a, x, y, yl):
     jwx = jacobian_wx(x, a[2], a[3])
 
     xw, _ = x_weighted(x, a[2], a[3])
 
-    error = resid(a, x, y, yl)
+    error = ssr(a, x, y, yl)
     if yl is None:
       jac_e = np.concatenate([np.ones((len(xw), 1)),  xw.reshape((len(xw), 1)), (a[0] * jwx)], axis=1)
     else:
