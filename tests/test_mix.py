@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 from midas import mix
+from midas.midas import estimate
 
 
 @pytest.fixture()
@@ -60,6 +61,16 @@ def test_mix(lf_data, hf_data):
     assert yl.loc['2009-07-01'].values[0] == 1.0
 
 
+def test_mix_no_ylag(lf_data, hf_data):
+    y, yl, x, yf, ylf, xf = mix.mix_freq(lf_data.val, hf_data.val, 3, 0, 1,
+                                         start_date=datetime.datetime(2009, 7, 1),
+                                         end_date=datetime.datetime(2010, 1, 1))
+
+    assert all(x.loc['2009-07-01'].values == [0.6, 0.5, 0.4])
+    assert all(x.loc['2010-01-01'].values == [1.2, 1.1, 1.0])
+    assert yl is None
+
+
 def test_mix_gdp(gdp_data, farmpay_data):
 
     y, yl, x, yf, ylf, xf = mix.mix_freq(gdp_data.gdp, farmpay_data.farmpay, 3, 1, 1,
@@ -71,3 +82,14 @@ def test_mix_gdp(gdp_data, farmpay_data):
     assert all(x.loc['1985-01-01'].values == [farmpay_data.loc['1984-12-01'].farmpay,
                                               farmpay_data.loc['1984-11-01'].farmpay,
                                               farmpay_data.loc['1984-10-01'].farmpay])
+
+
+def test_estimate(gdp_data, farmpay_data):
+
+    y, yl, x, yf, ylf, xf = mix.mix_freq(gdp_data.gdp, farmpay_data.farmpay, 3, 1, 1,
+                                         start_date=datetime.datetime(1985, 1, 1),
+                                         end_date=datetime.datetime(2009, 1, 1))
+
+    res = estimate(y, yl, x)
+
+    assert False

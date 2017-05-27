@@ -26,7 +26,10 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
 
     forecast_start_date = lf_data.index[lf_data.index.get_loc(end_date) + 1]
 
-    ylags = pd.concat([lf_data.shift(l) for l in range(1, ylag + 1)], axis=1)
+    ylags = None
+    if ylag > 0:
+        # N.B. ylags will be a dataframe because there can be more than 1 lag
+        ylags = pd.concat([lf_data.shift(l) for l in range(1, ylag + 1)], axis=1)
 
     x_rows = []
 
@@ -37,10 +40,10 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
     x = pd.DataFrame(data=x_rows, index=lf_data.loc[start_date:].index)
 
     return (lf_data.loc[start_date:end_date],
-            ylags.loc[start_date:end_date],
+            ylags.loc[start_date:end_date] if ylag > 0 else None,
             x.loc[start_date:end_date],
             lf_data[forecast_start_date:],
-            ylags[forecast_start_date:],
+            ylags[forecast_start_date:] if ylag > 0 else None,
             x.loc[forecast_start_date:])
 
 
