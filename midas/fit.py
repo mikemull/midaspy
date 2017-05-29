@@ -20,9 +20,9 @@ def jacobian(a, x, y, yl):
     xw, _ = x_weighted(x, a[2], a[3])
 
     if yl is None:
-      jac_e = np.concatenate([np.ones((len(xw), 1)),  xw.reshape((len(xw), 1)), (a[1] * jwx)], axis=1)
+        jac_e = np.concatenate([np.ones((len(xw), 1)), xw.reshape((len(xw), 1)), (a[1] * jwx)], axis=1)
     else:
-      jac_e = np.concatenate([np.ones((len(xw), 1)),  xw.reshape((len(xw), 1)), (a[1] * jwx), yl], axis=1)
+        jac_e = np.concatenate([np.ones((len(xw), 1)), xw.reshape((len(xw), 1)), (a[1] * jwx), yl], axis=1)
 
     return -1.0 * jac_e
 

@@ -1,5 +1,5 @@
 import numpy as np
-
+import pandas as pd
 
 from scipy.optimize import least_squares
 
@@ -22,3 +22,16 @@ def estimate(y, yl, x):
 
     print(opt_res.x)
     print(opt_res.grad)
+
+    return opt_res
+
+
+def forecast(xfc, yfcl, res):
+
+    a, b, theta1, theta2, l = res.x
+
+    xw, w = x_weighted(xfc.values, theta1, theta2)
+
+    yf = a + b * xw + l * yfcl.values[:, 0]
+
+    return pd.DataFrame(yf, index=xfc.index)

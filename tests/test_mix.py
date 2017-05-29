@@ -1,11 +1,8 @@
 import pytest
-import os
 import datetime
-import numpy as np
 import pandas as pd
 
 from midas import mix
-from midas.midas import estimate
 
 
 @pytest.fixture()
@@ -29,26 +26,6 @@ def hf_data():
     df.set_index('date', inplace=True)
 
     return df
-
-
-@pytest.fixture()
-def gdp_data(request):
-    df = pd.read_csv(os.path.join(os.path.dirname(request.module.__file__), 'data', 'gdp.csv'),
-                     parse_dates=['DATE'])
-
-    df['gdp'] = (np.log(df.VALUE) - np.log(df.VALUE.shift(1))) * 100.
-
-    return df.set_index('DATE')
-
-
-@pytest.fixture()
-def farmpay_data(request):
-    df = pd.read_csv(os.path.join(os.path.dirname(request.module.__file__), 'data', 'farmpay.csv'),
-                     parse_dates=['DATE'])
-
-    df['farmpay'] = (np.log(df.VALUE) - np.log(df.VALUE.shift(1))) * 100.
-
-    return df.set_index('DATE')
 
 
 def test_mix(lf_data, hf_data):
@@ -82,14 +59,3 @@ def test_mix_gdp(gdp_data, farmpay_data):
     assert all(x.loc['1985-01-01'].values == [farmpay_data.loc['1984-12-01'].farmpay,
                                               farmpay_data.loc['1984-11-01'].farmpay,
                                               farmpay_data.loc['1984-10-01'].farmpay])
-
-
-def test_estimate(gdp_data, farmpay_data):
-
-    y, yl, x, yf, ylf, xf = mix.mix_freq(gdp_data.gdp, farmpay_data.farmpay, 3, 1, 1,
-                                         start_date=datetime.datetime(1985, 1, 1),
-                                         end_date=datetime.datetime(2009, 1, 1))
-
-    res = estimate(y, yl, x)
-
-    assert False

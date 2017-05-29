@@ -60,4 +60,4 @@ if __name__ == '__main__':
 
     y, x = mix_freq(lf_g.VALUE, hf_g, 9, 1, 1,
                     start_date=datetime.datetime(1985, 1, 1),
-                    end_date=datetime.datetime(2009,1,1))
+                    end_date=datetime.datetime(2009, 1, 1))

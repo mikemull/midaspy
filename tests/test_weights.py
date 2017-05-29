@@ -1,4 +1,3 @@
-import pytest
 import numpy as np
 
 from midas.weights import beta_weights_es, x_weighted
@@ -7,7 +6,7 @@ from midas.weights import beta_weights_es, x_weighted
 def test_beta_es():
     w = beta_weights_es(3, 1, 5)
 
-    assert np.allclose(w,[0.941176, 0.0588238, 9.4118e-25])
+    assert np.allclose(w, [0.941176, 0.0588238, 9.4118e-25])
 
 
 def test_x_weighted():
