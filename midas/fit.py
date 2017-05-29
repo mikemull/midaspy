@@ -19,17 +19,12 @@ def jacobian(a, x, y, yl):
 
     xw, _ = x_weighted(x, a[2], a[3])
 
-    error = ssr(a, x, y, yl)
     if yl is None:
-      jac_e = np.concatenate([np.ones((len(xw), 1)),  xw.reshape((len(xw), 1)), (a[0] * jwx)], axis=1)
+      jac_e = np.concatenate([np.ones((len(xw), 1)),  xw.reshape((len(xw), 1)), (a[1] * jwx)], axis=1)
     else:
-      jac_e = np.concatenate([np.ones((len(xw), 1)),  xw.reshape((len(xw), 1)), (a[0] * jwx), yl], axis=1)
+      jac_e = np.concatenate([np.ones((len(xw), 1)),  xw.reshape((len(xw), 1)), (a[1] * jwx), yl], axis=1)
 
-    jac = np.zeros(jac_e.shape)
-    for i in range(len(a)):
-        jac[:, i] = -2 * jac_e[:, i] * error
-
-    return np.sum(jac, axis=0).T
+    return -1.0 * jac_e
 
 
 def jacobian_wx(x, theta1, theta2):

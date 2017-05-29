@@ -4,7 +4,8 @@ import numpy as np
 def beta_weights_es(n, theta1, theta2):
     """ Evenly-spaced beta weights
     """
-    u = np.linspace(1e-6, 1.0 - 1e-6, n)
+    eps = np.spacing(1)
+    u = np.linspace(eps, 1.0 - eps, n)
 
     beta_vals = u ** (theta1 - 1) * (1 - u) ** (theta2 - 1)
 
