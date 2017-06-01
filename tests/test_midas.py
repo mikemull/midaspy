@@ -1,4 +1,5 @@
 import datetime
+import numpy as np
 
 from midas import mix
 from midas.midas import estimate, forecast
@@ -16,4 +17,4 @@ def test_estimate(gdp_data, farmpay_data):
 
     print(fc)
 
-    assert False
+    assert np.isclose(fc.loc['2011-04-01'][0], 1.336844, rtol=1e-6)
