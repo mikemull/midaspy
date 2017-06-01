@@ -59,3 +59,24 @@ def test_mix_gdp(gdp_data, farmpay_data):
     assert all(x.loc['1985-01-01'].values == [farmpay_data.loc['1984-12-01'].farmpay,
                                               farmpay_data.loc['1984-11-01'].farmpay,
                                               farmpay_data.loc['1984-10-01'].farmpay])
+
+
+def test_data_freq(lf_data, hf_data):
+
+    assert mix.data_freq(lf_data)[0] == 'Q'
+    assert mix.data_freq(hf_data)[0] == 'M'
+
+    idx = pd.date_range(start='2012-03-31', periods=5, freq='Q-DEC')
+    assert mix.data_freq(pd.Series(lf_data.val.values, index=idx)) == 'Q-DEC'
+
+
+@pytest.mark.parametrize("lag_string, freq, expected", [
+    ("3M", "D", 66),
+    ("3M", "M", 3),
+    ("12Q", "M", 36),
+    ("3m", "d", 66),
+    ("2y", "q", 8),
+    ("2y", "a", 2),
+])
+def test_parse_lag_string(lag_string, freq, expected):
+    assert mix.parse_lag_string(lag_string, freq) == expected

@@ -1,4 +1,5 @@
 import datetime
+import re
 import pandas as pd
 import numpy as np
 
@@ -45,6 +46,47 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
             lf_data[forecast_start_date:],
             ylags[forecast_start_date:] if ylag > 0 else None,
             x.loc[forecast_start_date:])
+
+
+def data_freq(time_series):
+    """
+    Determine frequency of given time series
+
+    Args:
+        time_series (Series): Series with datetime index
+
+    Returns:
+        string: frequency specifier
+    """
+
+    return time_series.index.freq or pd.infer_freq(time_series.index)
+
+
+def parse_lag_string(lag_string, freq):
+    """
+    Determine number of lags from lag string
+
+    Args:
+        lag_string: String indicating number of lags (eg, "3M", "2Q")
+        freq (string): Frequency of series to be lagged
+
+    Returns:
+
+    """
+
+    freq_map = {
+        'd': {'m': 22, 'd': 1},
+        'm': {'q': 3, 'm': 1},
+        'q': {'y': 4},
+        'a': {'y': 1}
+    }
+
+    m = re.match('(\d+)(\w)', lag_string)
+
+    duration = int(m.group(1))
+    period = m.group(2).lower()
+
+    return duration * freq_map[freq.lower()][period]
 
 
 if __name__ == '__main__':
