@@ -48,17 +48,27 @@ def test_mix_no_ylag(lf_data, hf_data):
     assert yl is None
 
 
-def test_mix_gdp(gdp_data, farmpay_data):
+def test_mix_lag_string(lf_data, hf_data):
+    y, yl, x, yf, ylf, xf = mix.mix_freq(lf_data.val, hf_data.val, "3M", 1, 1,
+                                         start_date=datetime.datetime(2009, 7, 1),
+                                         end_date=datetime.datetime(2010, 1, 1))
 
-    y, yl, x, yf, ylf, xf = mix.mix_freq(gdp_data.gdp, farmpay_data.farmpay, 3, 1, 1,
+    assert all(x.loc['2009-07-01'].values == [0.6, 0.5, 0.4])
+    assert all(x.loc['2010-01-01'].values == [1.2, 1.1, 1.0])
+    assert yl.loc['2009-07-01'].values[0] == 1.0
+
+
+def test_mix_gdp(gdp_data, pay_data):
+
+    y, yl, x, yf, ylf, xf = mix.mix_freq(gdp_data.gdp, pay_data.pay, 3, 1, 1,
                                          start_date=datetime.datetime(1985, 1, 1),
                                          end_date=datetime.datetime(2009, 1, 1))
 
     assert len(y) == 97
 
-    assert all(x.loc['1985-01-01'].values == [farmpay_data.loc['1984-12-01'].farmpay,
-                                              farmpay_data.loc['1984-11-01'].farmpay,
-                                              farmpay_data.loc['1984-10-01'].farmpay])
+    assert all(x.loc['1985-01-01'].values == [pay_data.loc['1984-12-01'].pay,
+                                              pay_data.loc['1984-11-01'].pay,
+                                              pay_data.loc['1984-10-01'].pay])
 
 
 def test_data_freq(lf_data, hf_data):

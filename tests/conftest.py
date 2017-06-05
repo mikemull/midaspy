@@ -16,10 +16,10 @@ def gdp_data(request):
 
 
 @pytest.fixture()
-def farmpay_data(request):
-    df = pd.read_csv(os.path.join(os.path.dirname(request.module.__file__), 'data', 'farmpay.csv'),
+def pay_data(request):
+    df = pd.read_csv(os.path.join(os.path.dirname(request.module.__file__), 'data', 'pay.csv'),
                      parse_dates=['DATE'])
 
-    df['farmpay'] = (np.log(df.VALUE) - np.log(df.VALUE.shift(1))) * 100.
+    df['pay'] = (np.log(df.VALUE) - np.log(df.VALUE.shift(1))) * 100.
 
     return df.set_index('DATE')

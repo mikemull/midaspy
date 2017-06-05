@@ -5,9 +5,9 @@ from midas import mix
 from midas.midas import estimate, forecast
 
 
-def test_estimate(gdp_data, farmpay_data):
+def test_estimate(gdp_data, pay_data):
 
-    y, yl, x, yf, ylf, xf = mix.mix_freq(gdp_data.gdp, farmpay_data.farmpay, 3, 1, 1,
+    y, yl, x, yf, ylf, xf = mix.mix_freq(gdp_data.gdp, pay_data.pay, 3, 1, 1,
                                          start_date=datetime.datetime(1985, 1, 1),
                                          end_date=datetime.datetime(2009, 1, 1))
 

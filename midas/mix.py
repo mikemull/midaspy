@@ -11,8 +11,8 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
     Args:
         lf_data (Series): Low-frequency time series
         hf_data (Series): High-frequency time series
-        xlag (int): Number of high frequency lags
-        ylag (int): Number of low-frequency lags
+        xlag (int or str): Number of high frequency lags
+        ylag (int or str): Number of low-frequency lags
         horizon (int):
         start_date (date): Date on which to start estimation
         end_date (date); Date on which to end estimation
@@ -26,6 +26,9 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
         end_date = lf_data.index[xlag + horizon]
 
     forecast_start_date = lf_data.index[lf_data.index.get_loc(end_date) + 1]
+
+    ylag = calculate_lags(ylag, lf_data)
+    xlag = calculate_lags(xlag, hf_data)
 
     ylags = None
     if ylag > 0:
@@ -46,6 +49,14 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
             lf_data[forecast_start_date:],
             ylags[forecast_start_date:] if ylag > 0 else None,
             x.loc[forecast_start_date:])
+
+
+def calculate_lags(lag, time_series):
+
+    if isinstance(lag, str):
+        return parse_lag_string(lag, data_freq(time_series)[0])
+    else:
+        return lag
 
 
 def data_freq(time_series):
