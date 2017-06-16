@@ -58,6 +58,14 @@ def test_mix_lag_string(lf_data, hf_data):
     assert yl.loc['2009-07-01'].values[0] == 1.0
 
 
+def test_mix_no_start_end(lf_data, hf_data):
+    y, yl, x, yf, ylf, xf = mix.mix_freq(lf_data.val, hf_data.val, "3M", 1, 1)
+
+    assert all(x.loc['2009-07-01'].values == [0.6, 0.5, 0.4])
+    assert all(x.loc['2010-01-01'].values == [1.2, 1.1, 1.0])
+    assert yl.loc['2009-07-01'].values[0] == 1.0
+
+
 def test_mix_gdp(gdp_data, pay_data):
 
     y, yl, x, yf, ylf, xf = mix.mix_freq(gdp_data.gdp, pay_data.pay, 3, 1, 1,

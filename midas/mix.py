@@ -20,15 +20,18 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
     Returns:
 
     """
-    if start_date is None:
-        start_date = lf_data.index[ylag]
-    if end_date is None:
-        end_date = lf_data.index[xlag + horizon]
-
-    forecast_start_date = lf_data.index[lf_data.index.get_loc(end_date) + 1]
 
     ylag = calculate_lags(ylag, lf_data)
     xlag = calculate_lags(xlag, hf_data)
+
+    if start_date is None:
+        start_date = lf_data.index[ylag]
+    if end_date is None:
+        # @todo Not quite sure what the default should be.  This assumes we want at least
+        # one low-frequency period to forecast
+        end_date = lf_data.index[-2]
+
+    forecast_start_date = lf_data.index[lf_data.index.get_loc(end_date) + 1]
 
     ylags = None
     if ylag > 0:
@@ -69,8 +72,11 @@ def data_freq(time_series):
     Returns:
         string: frequency specifier
     """
-
-    return time_series.index.freq or pd.infer_freq(time_series.index)
+    try:
+        freq = time_series.index.freq
+        return freq or pd.infer_freq(time_series.index)
+    except AttributeError:
+        return pd.infer_freq(time_series.index)
 
 
 def parse_lag_string(lag_string, freq):
@@ -87,6 +93,7 @@ def parse_lag_string(lag_string, freq):
 
     freq_map = {
         'd': {'m': 22, 'd': 1},
+        'b': {'m': 22, 'b': 1},
         'm': {'q': 3, 'm': 1},
         'q': {'y': 4},
         'a': {'y': 1}

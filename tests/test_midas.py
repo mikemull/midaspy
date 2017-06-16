@@ -2,7 +2,7 @@ import datetime
 import numpy as np
 
 from midas import mix
-from midas.midas import estimate, forecast
+from midas.regression import estimate, forecast
 
 
 def test_estimate(gdp_data, pay_data):
