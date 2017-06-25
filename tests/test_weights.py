@@ -9,6 +9,12 @@ def test_beta_es():
     assert np.allclose(w, [0.941176, 0.0588238, 9.4118e-25])
 
 
+def test_beta_es_nz():
+    w = beta_weights_es(3, 1, 5, 0.1)
+
+    assert np.allclose(w, [0.800905, 0.122172, 0.076923])
+
+
 def test_almon():
     w = exp_almon_weights(3, -1., 0.)
 
@@ -18,7 +24,7 @@ def test_almon():
 def test_x_weighted():
     x = np.ones((3, 3))
 
-    xw, w = x_weighted(x, 1., 5.)
+    xw, w = x_weighted(x, [1., 5.])
 
     assert x.shape[0] == xw.shape[0]
     assert np.allclose(xw, [1., 1., 1.])

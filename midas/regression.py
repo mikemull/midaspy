@@ -3,11 +3,11 @@ import pandas as pd
 
 from scipy.optimize import least_squares
 
-from midas.weights import x_weighted
+from midas.weights import x_weighted, BetaWeights
 from midas.fit import ssr, jacobian
 
 
-def estimate(y, yl, x):
+def estimate(y, yl, x, poly='beta'):
     """
     Fit MIDAS model
 
@@ -19,7 +19,10 @@ def estimate(y, yl, x):
     Returns:
         scipy.optimize.OptimizeResult
     """
-    xw, w = x_weighted(x, 1., 5.)
+
+    weight_method = BetaWeights(1., 5.)
+
+    xw, w = x_weighted(x, weight_method.init_params())
 
     # First we do OLS to get initial parameters
     c = np.linalg.lstsq(np.concatenate([np.ones((len(xw), 1)), xw.reshape((len(xw), 1)), yl], axis=1), y)[0]
@@ -27,7 +30,7 @@ def estimate(y, yl, x):
     f = lambda v: ssr(v, x.values, y.values, yl.values)
     jac = lambda v: jacobian(v, x.values, y.values, yl.values)
 
-    opt_res = least_squares(f, np.concatenate([c[0:2], [1., 5.], c[2:]]), jac, xtol=1e-10, verbose=2)
+    opt_res = least_squares(f, np.concatenate([c[0:2], weight_method.init_params(), c[2:]]), jac, xtol=1e-10, verbose=2)
 
     return opt_res
 
@@ -39,7 +42,7 @@ def forecast(xfc, yfcl, res):
 
     a, b, theta1, theta2, l = res.x
 
-    xw, w = x_weighted(xfc.values, theta1, theta2)
+    xw, w = x_weighted(xfc.values, [theta1, theta2])
 
     yf = a + b * xw + l * yfcl.values[:, 0]
 

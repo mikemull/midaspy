@@ -4,8 +4,23 @@ from .weights import x_weighted
 
 
 def ssr(a, x, y, yl):
+    """
+    Calculate the sum of the squared residuals of the MiDAS equations.  Parameters are arranged
+    a_h = a[0]
+    b_h = a[1]
+    theta is a[2:n]
+    y lag params are a[n:]
 
-    xw, _ = x_weighted(x, a[2], a[3])
+    Args:
+        a:
+        x:
+        y:
+        yl:
+
+    Returns:
+
+    """
+    xw, _ = x_weighted(x, a[2:4])
 
     error = y - a[0] - a[1] * xw
     if yl is not None:
@@ -15,9 +30,10 @@ def ssr(a, x, y, yl):
 
 
 def jacobian(a, x, y, yl):
-    jwx = jacobian_wx(x, a[2], a[3])
 
-    xw, _ = x_weighted(x, a[2], a[3])
+    jwx = jacobian_wx(x, a[2:4])
+
+    xw, _ = x_weighted(x, a[2:4])
 
     if yl is None:
         jac_e = np.concatenate([np.ones((len(xw), 1)), xw.reshape((len(xw), 1)), (a[1] * jwx)], axis=1)
@@ -27,15 +43,15 @@ def jacobian(a, x, y, yl):
     return -1.0 * jac_e
 
 
-def jacobian_wx(x, theta1, theta2):
+def jacobian_wx(x, params):
     eps = 1e-6
 
-    xt1p, w = x_weighted(x, theta1 + eps / 2, theta2)
-    xt1m, w = x_weighted(x, theta1 - eps / 2, theta2)
-    jt1 = (xt1p - xt1m) / eps
+    jt = []
+    for i, p in enumerate(params):
+        dp = np.concatenate([params[0:i], [p + eps / 2], params[i + 1:]])
+        dm = np.concatenate([params[0:i], [p - eps / 2], params[i + 1:]])
+        jtp, _ = x_weighted(x, dp)
+        jtm, _ = x_weighted(x, dm)
+        jt.append((jtp - jtm) / eps)
 
-    xt2p, w = x_weighted(x, theta1, theta2 + eps / 2)
-    xt2m, w = x_weighted(x, theta1, theta2 - eps / 2)
-    jt2 = (xt2p - xt2m) / eps
-
-    return np.column_stack([jt1, jt2])
+    return np.column_stack(jt)
