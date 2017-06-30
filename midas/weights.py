@@ -1,6 +1,16 @@
 import numpy as np
 
 
+def polynomial_weights(poly):
+    poly_class = {
+        'beta': BetaWeights(1., 5.),
+        'beta_nz': BetaWeights(1., 5.),
+        'expalmon': ExpAlmonWeights(-1., 0.)
+    }
+
+    return poly_class[poly]
+
+
 class WeightMethod(object):
     def __init__(self):
         pass
@@ -24,8 +34,30 @@ class BetaWeights(WeightMethod):
 
         return beta_vals / sum(beta_vals)
 
-    def init_params(self):
+    @staticmethod
+    def init_params():
         return np.array([1., 5.])
+
+
+class ExpAlmonWeights(WeightMethod):
+    def __init__(self, theta1, theta2):
+        pass
+
+    def weights(self, nlags):
+        """
+        Exponential Almon weights
+
+        Returns:
+            array: Array of weights
+
+        """
+        ilag = np.arange(1, nlags + 1)
+        z = np.exp((self.theta1 * ilag) + (self.theta2 * ilag) ** 2)
+        return z / sum(z)
+
+    @staticmethod
+    def init_params():
+        return np.array([-1., 0.])
 
 
 def beta_weights_es(n, theta1, theta2, theta3=None):

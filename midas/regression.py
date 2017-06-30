@@ -3,7 +3,7 @@ import pandas as pd
 
 from scipy.optimize import least_squares
 
-from midas.weights import x_weighted, BetaWeights
+from midas.weights import x_weighted, polynomial_weights
 from midas.fit import ssr, jacobian
 
 
@@ -20,7 +20,7 @@ def estimate(y, yl, x, poly='beta'):
         scipy.optimize.OptimizeResult
     """
 
-    weight_method = BetaWeights(1., 5.)
+    weight_method = polynomial_weights(poly)
 
     xw, w = x_weighted(x, weight_method.init_params())
 
