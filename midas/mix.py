@@ -74,7 +74,7 @@ def data_freq(time_series):
     """
     try:
         freq = time_series.index.freq
-        return freq or pd.infer_freq(time_series.index)
+        return freq.freqstr or pd.infer_freq(time_series.index)
     except AttributeError:
         return pd.infer_freq(time_series.index)
 

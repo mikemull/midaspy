@@ -88,6 +88,32 @@ def test_data_freq(lf_data, hf_data):
     assert mix.data_freq(pd.Series(lf_data.val.values, index=idx)) == 'Q-DEC'
 
 
+def test_data_freq_infer():
+    dfm = pd.DataFrame(data={'a': [1, 2, 3, 4]},
+                       index=[datetime.datetime(2016, 1, 31),
+                              datetime.datetime(2016, 2, 29),
+                              datetime.datetime(2016, 3, 31),
+                              datetime.datetime(2016, 4, 30)])
+
+    assert mix.data_freq(dfm.a) == 'M'
+
+    dfb = pd.DataFrame(data={'a': [1, 2, 3, 4, 5, 6]},
+                       index=[datetime.datetime(2017, 7, 10),
+                              datetime.datetime(2017, 7, 11),
+                              datetime.datetime(2017, 7, 12),
+                              datetime.datetime(2017, 7, 13),
+                              datetime.datetime(2017, 7, 14),
+                              datetime.datetime(2017, 7, 17),
+                              ])
+
+    assert mix.data_freq(dfb.a)[0] == 'B'
+
+    dfb2 = pd.DataFrame(data={'a': [1, 2, 3, 4, 5, 6]},
+                       index=pd.date_range('2017-7-10', '2017-7-17', freq='B'))
+
+    assert mix.data_freq(dfb2.a)[0] == 'B'
+
+
 @pytest.mark.parametrize("lag_string, freq, expected", [
     ("3M", "D", 66),
     ("3M", "M", 3),
