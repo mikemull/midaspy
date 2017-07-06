@@ -20,9 +20,10 @@ class WeightMethod(object):
 
 
 class BetaWeights(WeightMethod):
-    def __init__(self, theta1, theta2):
+    def __init__(self, theta1, theta2, theta3=None):
         self.theta1 = theta1
         self.theta2 = theta2
+        self.theta3 = theta3
 
     def weights(self, nlags):
         """ Evenly-spaced beta weights
@@ -34,6 +35,13 @@ class BetaWeights(WeightMethod):
 
         return beta_vals / sum(beta_vals)
 
+    def x_weighted(self, x, params):
+        self.theta1, self.theta2 = params
+
+        w = self.weights(x.shape[1])
+
+        return np.dot(x, w), np.tile(w.T, (x.shape[1], 1))
+
     @staticmethod
     def init_params():
         return np.array([1., 5.])
@@ -41,7 +49,8 @@ class BetaWeights(WeightMethod):
 
 class ExpAlmonWeights(WeightMethod):
     def __init__(self, theta1, theta2):
-        pass
+        self.theta1 = theta1
+        self.theta2 = theta2
 
     def weights(self, nlags):
         """
@@ -54,6 +63,13 @@ class ExpAlmonWeights(WeightMethod):
         ilag = np.arange(1, nlags + 1)
         z = np.exp((self.theta1 * ilag) + (self.theta2 * ilag) ** 2)
         return z / sum(z)
+
+    def x_weighted(self, x, params):
+        self.theta1, self.theta2 = params
+
+        w = self.weights(x.shape[1])
+
+        return np.dot(x, w), np.tile(w.T, (x.shape[1], 1))
 
     @staticmethod
     def init_params():

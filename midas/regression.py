@@ -22,13 +22,13 @@ def estimate(y, yl, x, poly='beta'):
 
     weight_method = polynomial_weights(poly)
 
-    xw, w = x_weighted(x, weight_method.init_params())
+    xw, w = weight_method.x_weighted(x, weight_method.init_params())
 
     # First we do OLS to get initial parameters
     c = np.linalg.lstsq(np.concatenate([np.ones((len(xw), 1)), xw.reshape((len(xw), 1)), yl], axis=1), y)[0]
 
-    f = lambda v: ssr(v, x.values, y.values, yl.values)
-    jac = lambda v: jacobian(v, x.values, y.values, yl.values)
+    f = lambda v: ssr(v, x.values, y.values, yl.values, weight_method)
+    jac = lambda v: jacobian(v, x.values, y.values, yl.values, weight_method)
 
     opt_res = least_squares(f, np.concatenate([c[0:2], weight_method.init_params(), c[2:]]), jac, xtol=1e-10, verbose=2)
 
