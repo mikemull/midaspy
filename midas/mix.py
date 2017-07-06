@@ -24,12 +24,23 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
     ylag = calculate_lags(ylag, lf_data)
     xlag = calculate_lags(xlag, hf_data)
 
-    if start_date is None:
-        start_date = lf_data.index[ylag]
+    min_date_y = lf_data.index[ylag]
+    min_date_x = hf_data.index[xlag + horizon]
+
+    if min_date_y < min_date_x:
+        min_date_y = next(d for d in list(lf_data.index) if d > min_date_x)
+
+    if (start_date is None) or (start_date < min_date_y):
+        start_date = min_date_y
     if end_date is None:
-        # @todo Not quite sure what the default should be.  This assumes we want at least
-        # one low-frequency period to forecast
         end_date = lf_data.index[-2]
+
+    max_date = lf_data.index[-1]
+    if max_date > hf_data.index[-1]:
+        max_date = next(d for d in reversed(list(lf_data.index)) if d < hf_data.index[-1])
+
+    if end_date > max_date:
+        end_date = max_date
 
     forecast_start_date = lf_data.index[lf_data.index.get_loc(end_date) + 1]
 
@@ -40,17 +51,17 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
 
     x_rows = []
 
-    for lfdate in lf_data.loc[start_date:].index:
+    for lfdate in lf_data.loc[start_date:max_date].index:
         start_hf = hf_data.index.get_loc(lfdate, method='bfill')  # @todo Find a more efficient way
         x_rows.append(hf_data.iloc[start_hf - horizon: start_hf - xlag - horizon: -1].values)
 
-    x = pd.DataFrame(data=x_rows, index=lf_data.loc[start_date:].index)
+    x = pd.DataFrame(data=x_rows, index=lf_data.loc[start_date:max_date].index)
 
     return (lf_data.loc[start_date:end_date],
             ylags.loc[start_date:end_date] if ylag > 0 else None,
             x.loc[start_date:end_date],
-            lf_data[forecast_start_date:],
-            ylags[forecast_start_date:] if ylag > 0 else None,
+            lf_data[forecast_start_date:max_date],
+            ylags[forecast_start_date:max_date] if ylag > 0 else None,
             x.loc[forecast_start_date:])
 
 

@@ -66,6 +66,29 @@ def test_mix_no_start_end(lf_data, hf_data):
     assert yl.loc['2009-07-01'].values[0] == 1.0
 
 
+def test_mix_lf_after_hf(lf_data, hf_data):
+    """ Case where high-freq data ends before last low-freq date
+    """
+    y, yl, x, yf, ylf, xf = mix.mix_freq(lf_data.val, hf_data.iloc[0:-2].val, 3, 0, 1,
+                                         start_date=datetime.datetime(2009, 7, 1),
+                                         end_date=datetime.datetime(2010, 1, 1))
+
+    assert all(x.loc['2009-07-01'].values == [0.6, 0.5, 0.4])
+    assert all(x.loc['2010-01-01'].values == [1.2, 1.1, 1.0])
+    assert yl is None
+
+
+def test_mix_hf_starts_after_lf(lf_data, hf_data):
+    """ Case where high-freq data ends before last low-freq date
+    """
+    y, yl, x, yf, ylf, xf = mix.mix_freq(lf_data.val, hf_data.iloc[4:].val, 3, 0, 1,
+                                         start_date=datetime.datetime(2009, 4, 1),
+                                         end_date=datetime.datetime(2010, 1, 1))
+
+    assert y.index[0] == datetime.datetime(2009, 10, 1)
+    assert all(x.loc['2009-10-01'].values == [0.9, 0.8, 0.7])
+
+
 def test_mix_gdp(gdp_data, pay_data):
 
     y, yl, x, yf, ylf, xf = mix.mix_freq(gdp_data.gdp, pay_data.pay, 3, 1, 1,
