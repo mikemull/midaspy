@@ -1,7 +1,5 @@
 import numpy as np
 
-from .weights import x_weighted
-
 
 def ssr(a, x, y, yl, weight_method):
     """

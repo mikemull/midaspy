@@ -132,7 +132,7 @@ def test_data_freq_infer():
     assert mix.data_freq(dfb.a)[0] == 'B'
 
     dfb2 = pd.DataFrame(data={'a': [1, 2, 3, 4, 5, 6]},
-                       index=pd.date_range('2017-7-10', '2017-7-17', freq='B'))
+                        index=pd.date_range('2017-7-10', '2017-7-17', freq='B'))
 
     assert mix.data_freq(dfb2.a)[0] == 'B'
 
