@@ -3,7 +3,7 @@ import pandas as pd
 
 from scipy.optimize import least_squares
 
-from midas.weights import x_weighted, polynomial_weights
+from midas.weights import polynomial_weights
 from midas.fit import ssr, jacobian
 
 
@@ -35,14 +35,15 @@ def estimate(y, yl, x, poly='beta'):
     return opt_res
 
 
-def forecast(xfc, yfcl, res):
+def forecast(xfc, yfcl, res, poly='beta'):
     """
     Use the results of MIDAS regression to forecast new periods
     """
+    weight_method = polynomial_weights(poly)
 
     a, b, theta1, theta2, l = res.x
 
-    xw, w = x_weighted(xfc.values, [theta1, theta2])
+    xw, w = weight_method.x_weighted(xfc.values, [theta1, theta2])
 
     yf = a + b * xw + l * yfcl.values[:, 0]
 

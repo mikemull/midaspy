@@ -43,8 +43,8 @@ def test_estimate_expalmon(gdp_data, pay_data):
 
     res = estimate(y, yl, x, poly='expalmon')
 
-    fc = forecast(xf, ylf, res)
+    fc = forecast(xf, ylf, res, poly='expalmon')
 
     print(fc)
 
-    assert np.isclose(fc.loc['2011-04-01'][0], 1.041955, rtol=1e-6)
+    assert np.isclose(fc.loc['2011-04-01'][0], 1.306661, rtol=1e-6)

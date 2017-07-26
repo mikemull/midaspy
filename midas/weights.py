@@ -48,6 +48,10 @@ class BetaWeights(WeightMethod):
 
         return np.dot(x, w), np.tile(w.T, (x.shape[1], 1))
 
+    @property
+    def num_params(self):
+        return 2 if self.theta3 is None else 3
+
     @staticmethod
     def init_params():
         return np.array([1., 5.])
@@ -76,6 +80,10 @@ class ExpAlmonWeights(WeightMethod):
         w = self.weights(x.shape[1])
 
         return np.dot(x, w), np.tile(w.T, (x.shape[1], 1))
+
+    @property
+    def num_params(self):
+        return 2
 
     @staticmethod
     def init_params():
