@@ -103,7 +103,7 @@ def parse_lag_string(lag_string, freq):
     """
 
     freq_map = {
-        'd': {'m': 22, 'd': 1},
+        'd': {'m': 30, 'd': 1},
         'b': {'m': 22, 'b': 1},
         'm': {'q': 3, 'm': 1},
         'q': {'y': 4},
