@@ -138,10 +138,12 @@ def test_data_freq_infer():
 
 
 @pytest.mark.parametrize("lag_string, freq, expected", [
-    ("3M", "D", 66),
+    ("3M", "D", 90),
+    ("3M", "B", 66),
     ("3M", "M", 3),
     ("12Q", "M", 36),
-    ("3m", "d", 66),
+    ("3m", "d", 90),
+    ("3m", "b", 66),
     ("2y", "q", 8),
     ("2y", "a", 2),
 ])
