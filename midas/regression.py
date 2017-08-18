@@ -30,7 +30,13 @@ def estimate(y, yl, x, poly='beta'):
     f = lambda v: ssr(v, x.values, y.values, yl.values, weight_method)
     jac = lambda v: jacobian(v, x.values, y.values, yl.values, weight_method)
 
-    opt_res = least_squares(f, np.concatenate([c[0:2], weight_method.init_params(), c[2:]]), jac, xtol=1e-10, verbose=0)
+    opt_res = least_squares(f,
+                            np.concatenate([c[0:2], weight_method.init_params(), c[2:]]),
+                            jac,
+                            xtol=1e-9,
+                            ftol=1e-9,
+                            max_nfev=5000,
+                            verbose=0)
 
     return opt_res
 
