@@ -53,5 +53,36 @@ def rolling(y_in, x_in, start_date, end_date, xlag, ylag, horizon, window_size=6
             pd.DataFrame({'preds': preds, 'targets': targets}, index=pd.DatetimeIndex(dt_index)))
 
 
+def recursive(y_in, x_in, start_date, forecast_start_date, xlag, ylag, horizon, forecast_horizon=1):
+    preds = []
+    targets = []
+    dt_index = []
+
+    forecast_start_loc = y_in.index.get_loc(forecast_start_date) - 1
+
+    model_end_dates = y_in.index[forecast_start_loc:-forecast_horizon]
+
+    for estimate_end in model_end_dates:
+        y, yl, x, yf, ylf, xf = mix_freq(y_in, x_in, xlag, ylag, horizon,
+                                         start_date=start_date,
+                                         end_date=estimate_end)
+        if len(xf) - forecast_horizon <= 0:
+            break
+
+        res = estimate(y, yl, x)
+
+        fc = forecast(xf, ylf, res)
+
+        preds.append(fc.iloc[forecast_horizon - 1].values[0])
+        targets.append(yf.iloc[forecast_horizon - 1])
+        dt_index.append(yf.index[forecast_horizon - 1])
+
+    preds = np.array(preds)
+    targets = np.array(targets)
+
+    return (rmse(preds, targets),
+            pd.DataFrame({'preds': preds, 'targets': targets}, index=pd.DatetimeIndex(dt_index)))
+
+
 def rmse(predictions, targets):
     return np.sqrt(((predictions - targets) ** 2).mean())
