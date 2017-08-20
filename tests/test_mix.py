@@ -89,6 +89,16 @@ def test_mix_hf_starts_after_lf(lf_data, hf_data):
     assert all(x.loc['2009-10-01'].values == [0.9, 0.8, 0.7])
 
 
+def test_mix_negative_h(lf_data, hf_data):
+    y, yl, x, yf, ylf, xf = mix.mix_freq(lf_data.val, hf_data.val, 3, 1, -1,
+                                         start_date=datetime.datetime(2009, 7, 1),
+                                         end_date=datetime.datetime(2010, 1, 1))
+
+    assert all(x.loc['2009-07-01'].values == [0.8, 0.7, 0.6])
+    assert all(x.loc['2010-01-01'].values == [1.4, 1.3, 1.2])
+    assert yl.loc['2009-07-01'].values[0] == 1.0
+
+
 def test_mix_gdp(gdp_data, pay_data):
 
     y, yl, x, yf, ylf, xf = mix.mix_freq(gdp_data.gdp, pay_data.pay, 3, 1, 1,

@@ -2,7 +2,7 @@ import datetime
 import numpy as np
 
 from midas import mix
-from midas.regression import estimate, forecast
+from midas.adl import estimate, forecast, rolling
 
 
 def test_estimate(gdp_data, pay_data):
@@ -48,3 +48,11 @@ def test_estimate_expalmon(gdp_data, pay_data):
     print(fc)
 
     assert np.isclose(fc.loc['2011-04-01'][0], 1.306661, rtol=1e-6)
+
+
+def test_rolling(gdp_data, pay_data):
+
+    rmse, yh_df = rolling(gdp_data.gdp, pay_data.pay, datetime.datetime(1985, 1, 1), None,
+                          "3m", 1, 1)
+
+    assert 0.6 < rmse < 0.7
