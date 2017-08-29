@@ -1,3 +1,4 @@
+import datetime
 import numpy as np
 import pandas as pd
 
@@ -55,12 +56,32 @@ def forecast(xfc, yfcl, res, poly='beta'):
 
     yf = a + b * xw + l * yfcl.values[:, 0]
 
-    return pd.DataFrame(yf, index=xfc.index)
+    return pd.DataFrame(yf, index=xfc.index, columns=['yfh'])
 
 
+def midas_adl(y_in, x_in, start_date, end_date, xlag, ylag, horizon, forecast_horizon=1, poly='beta', method='fixed'):
+    methods = {'fixed': fixed_window,
+               'rolling': rolling,
+               'recursive': recursive}
+
+    return methods[method](y_in, x_in, start_date, end_date, xlag, ylag, horizon, forecast_horizon, poly)
 
 
-def rolling(y_in, x_in, start_date, end_date, xlag, ylag, horizon, window_size=60, forecast_horizon=1):
+def fixed_window(y_in, x_in, start_date, end_date, xlag, ylag, horizon, forecast_horizon=1, poly='beta'):
+
+    y, yl, x, yf, ylf, xf = mix_freq(y_in, x_in, xlag, ylag, horizon,
+                                     start_date=start_date,
+                                     end_date=end_date)
+
+    res = estimate(y, yl, x, poly=poly)
+
+    fc = forecast(xf, ylf, res, poly=poly)
+
+    return (rmse(fc.yfh, yf),
+            pd.DataFrame({'preds': fc.yfh, 'targets': yf}, index=yf.index))
+
+
+def rolling(y_in, x_in, start_date, end_date, xlag, ylag, horizon, forecast_horizon=1, poly='beta'):
     """
     Make a series of forecasts using a fixed-size "rolling window" to fit the
     model
@@ -80,6 +101,7 @@ def rolling(y_in, x_in, start_date, end_date, xlag, ylag, horizon, window_size=6
     targets = []
     dt_index = []
     start_loc = y_in.index.get_loc(start_date)
+    window_size = 60
     if end_date is not None:
         end_loc = y_in.index.get_loc(end_date)
         window_size = end_loc - start_loc
@@ -108,12 +130,12 @@ def rolling(y_in, x_in, start_date, end_date, xlag, ylag, horizon, window_size=6
             pd.DataFrame({'preds': preds, 'targets': targets}, index=pd.DatetimeIndex(dt_index)))
 
 
-def recursive(y_in, x_in, start_date, forecast_start_date, xlag, ylag, horizon, forecast_horizon=1):
+def recursive(y_in, x_in, start_date, end_date, xlag, ylag, horizon, forecast_horizon=1, poly='beta'):
     preds = []
     targets = []
     dt_index = []
 
-    forecast_start_loc = y_in.index.get_loc(forecast_start_date) - 1
+    forecast_start_loc = y_in.index.get_loc(end_date)
 
     model_end_dates = y_in.index[forecast_start_loc:-forecast_horizon]
 
