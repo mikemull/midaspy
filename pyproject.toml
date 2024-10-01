@@ -13,6 +13,7 @@ scipy = "^1.14.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
+ruff = "^0.6.8"
 
 [build-system]
 requires = ["poetry-core"]

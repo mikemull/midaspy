@@ -46,7 +46,7 @@ def mix_freq(lf_data, hf_data, xlag, ylag, horizon, start_date=None, end_date=No
     ylags = None
     if ylag > 0:
         # N.B. ylags will be a dataframe because there can be more than 1 lag
-        ylags = pd.concat([lf_data.shift(l) for l in range(1, ylag + 1)], axis=1)
+        ylags = pd.concat([lf_data.shift(lag) for lag in range(1, ylag + 1)], axis=1)
 
     x_rows = []
 

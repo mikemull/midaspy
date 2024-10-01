@@ -1,4 +1,3 @@
-import datetime
 import numpy as np
 import pandas as pd
 
@@ -30,10 +29,13 @@ def estimate(y, yl, x, poly='beta'):
     # First we do OLS to get initial parameters
     c = np.linalg.lstsq(np.concatenate([np.ones((len(xw), 1)), xw.reshape((len(xw), 1)), yl], axis=1), y)[0]
 
-    f = lambda v: ssr(v, x.values, y.values, yl.values, weight_method)
-    jac = lambda v: jacobian(v, x.values, y.values, yl.values, weight_method)
+    def fun(v):
+        return ssr(v, x.values, y.values, yl.values, weight_method)
 
-    opt_res = least_squares(f,
+    def jac(v):
+        return jacobian(v, x.values, y.values, yl.values, weight_method)
+
+    opt_res = least_squares(fun,
                             np.concatenate([c[0:2], weight_method.init_params(), c[2:]]),
                             jac,
                             xtol=1e-9,
@@ -50,11 +52,11 @@ def forecast(xfc, yfcl, res, poly='beta'):
     """
     weight_method = polynomial_weights(poly)
 
-    a, b, theta1, theta2, l = res.x
+    a, b, theta1, theta2, lags = res.x
 
     xw, w = weight_method.x_weighted(xfc.values, [theta1, theta2])
 
-    yf = a + b * xw + l * yfcl.values[:, 0]
+    yf = a + b * xw + lags * yfcl.values[:, 0]
 
     return pd.DataFrame(yf, index=xfc.index, columns=['yfh'])
 
