@@ -117,8 +117,8 @@ def test_data_freq(lf_data, hf_data):
     assert mix.data_freq(lf_data)[0] == 'Q'
     assert mix.data_freq(hf_data)[0] == 'M'
 
-    idx = pd.date_range(start='2012-03-31', periods=5, freq='Q-DEC')
-    assert mix.data_freq(pd.Series(lf_data.val.values, index=idx)) == 'Q-DEC'
+    idx = pd.date_range(start='2012-03-31', periods=5, freq='QE-DEC')
+    assert mix.data_freq(pd.Series(lf_data.val.values, index=idx)) == 'QE-DEC'
 
 
 def test_data_freq_infer():
@@ -128,7 +128,7 @@ def test_data_freq_infer():
                               datetime.datetime(2016, 3, 31),
                               datetime.datetime(2016, 4, 30)])
 
-    assert mix.data_freq(dfm.a) == 'M'
+    assert mix.data_freq(dfm.a) == 'ME'
 
     dfb = pd.DataFrame(data={'a': [1, 2, 3, 4, 5, 6]},
                        index=[datetime.datetime(2017, 7, 10),
