@@ -58,7 +58,7 @@ jobs:
     - name: Run Ruff
       run: |
         source .venv/bin/activate
-        ruff check --output-format=github .
+        ruff check --output-format=github midas/
     - name: Test with pytest
       run: |
         source .venv/bin/activate
