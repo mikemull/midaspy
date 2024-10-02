@@ -55,6 +55,8 @@ jobs:
     #----------------------------------------------
     - name: Install project
       run: poetry install --no-interaction
+    - name: Run Ruff
+      run: ruff check --output-format=github .
     - name: Test with pytest
       run: |
         source .venv/bin/activate
