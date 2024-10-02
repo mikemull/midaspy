@@ -57,6 +57,5 @@ jobs:
       run: poetry install --no-interaction
     - name: Test with pytest
       run: |
-        pip install -e .
         source .venv/bin/activate
-        pytest
+        poetry run pytest
