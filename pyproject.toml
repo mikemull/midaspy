@@ -5,11 +5,13 @@ description = "Python version of Mixed Data Sampling (MIDAS) regression"
 authors = ["Mike Mull <mike.mull@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+packages = [{include = "midas"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 pandas = "^2.2.3"
 scipy = "^1.14.1"
+numpy = "^1.26.0"  
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
